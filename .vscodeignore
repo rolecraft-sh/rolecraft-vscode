@@ -1,0 +1,23 @@
+# Source
+src/
+*.ts
+*.map
+
+# Build
+node_modules/
+
+# Config
+.github/
+.vscode/
+tsconfig.json
+esbuild.js
+biome.json
+
+# Tests
+**/*.test.ts
+**/*.test.js
+
+# Dev files
+*.vsix
+.git/
+.gitignore
