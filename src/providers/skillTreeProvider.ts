@@ -1,9 +1,9 @@
 import * as vscode from 'vscode'
-import type { Skill } from '../types.js'
+import type { Skill, SkillListResult } from '../types.js'
 import { runRolecraftJson } from '../utils/cli.js'
 import { RoleCraftNotFoundError } from '../utils/errors.js'
 
-type SkillTreeItemElement = { type: 'root' } | { type: 'skill'; skill: Skill }
+type SkillTreeItemElement = { type: 'root' } | { type: 'skill'; skill: Skill; slug: string }
 
 export class SkillTreeProvider implements vscode.TreeDataProvider<SkillTreeItemElement> {
   private _onDidChangeTreeData = new vscode.EventEmitter<SkillTreeItemElement | undefined>()
@@ -20,17 +20,12 @@ export class SkillTreeProvider implements vscode.TreeDataProvider<SkillTreeItemE
       return item
     }
 
-    const { skill } = element
-    const item = new vscode.TreeItem(
-      `${skill.name} v${skill.version}`,
-      vscode.TreeItemCollapsibleState.None,
-    )
-    item.description = skill.description
-    item.contextValue = skill.installed ? 'skillInstalled' : 'skillAvailable'
-
-    if (skill.installed) {
-      item.iconPath = new vscode.ThemeIcon('check')
-    }
+    const { skill, slug } = element
+    const name = slug.split('/').pop() ?? slug
+    const item = new vscode.TreeItem(name, vscode.TreeItemCollapsibleState.None)
+    item.description = skill.source
+    item.contextValue = 'skillInstalled'
+    item.iconPath = new vscode.ThemeIcon('check')
 
     item.command = {
       command: 'rolecraft.test',
@@ -48,8 +43,12 @@ export class SkillTreeProvider implements vscode.TreeDataProvider<SkillTreeItemE
 
     if (element.type === 'root') {
       try {
-        const skills = await runRolecraftJson<Skill[]>(['list'])
-        return skills.map((skill) => ({ type: 'skill' as const, skill }))
+        const result = await runRolecraftJson<SkillListResult>(['list'])
+        return Object.entries(result.skills).map(([slug, skill]) => ({
+          type: 'skill' as const,
+          slug,
+          skill,
+        }))
       } catch (error) {
         if (error instanceof RoleCraftNotFoundError) {
           vscode.window.showErrorMessage(

@@ -1,15 +1,20 @@
 import type { TreeItem } from 'vscode'
 
 export interface Skill {
-  name: string
   slug: string
-  owner: string
-  description: string
-  category: string
-  version: string
-  installed: boolean
+  contentSha: string
+  fileHashes: Record<string, string>
+  installedAt: string
   agents: string[]
-  mcp_servers: string[]
+  source: string
+  sourceType: string
+  history: string[]
+  scope: string
+}
+
+export interface SkillListResult {
+  skills: Record<string, Skill>
+  total: number
 }
 
 export type MCPServerStatus = 'running' | 'stopped'

@@ -1,12 +1,11 @@
 import * as vscode from 'vscode'
-import { runRolecraftJson } from '../utils/cli.js'
+import { runRolecraft, runRolecraftJson } from '../utils/cli.js'
 import { getConfig, onConfigChange } from '../utils/config.js'
 import { RoleCraftNotFoundError } from '../utils/errors.js'
 
-interface StatusInfo {
-  version: string
-  skillCount: number
-  mcpCount: number
+interface SkillListResult {
+  skills: Record<string, unknown>
+  total: number
 }
 
 export class StatusBarProvider implements vscode.Disposable {
@@ -26,7 +25,7 @@ export class StatusBarProvider implements vscode.Disposable {
     this.disposables.push(
       onConfigChange((config) => {
         if (config.showStatusBar) {
-          this.start(config.showStatusBar)
+          this.start(true)
         } else {
           this.stop()
         }
@@ -61,16 +60,33 @@ export class StatusBarProvider implements vscode.Disposable {
     }
 
     try {
-      const info = await runRolecraftJson<StatusInfo>(['status'])
-      this.statusBarItem.text = `$(beaker) rolecraft v${info.version} | ${info.skillCount} skills | ${info.mcpCount} MCP`
-      this.statusBarItem.tooltip = `RoleCraft v${info.version}\nSkills: ${info.skillCount}\nMCP Servers: ${info.mcpCount}`
+      const version = await runRolecraft(['--version'])
+      const skillList = await runRolecraftJson<SkillListResult>(['list'])
+      const skillCount = skillList.total ?? 0
+
+      let mcpCount = 0
+      try {
+        const mcpOutput = await runRolecraft(['mcp', 'list'])
+        const mcpMatch = mcpOutput.match(/\((\d+)\)/)
+        if (mcpMatch) {
+          mcpCount = Number.parseInt(mcpMatch[1], 10)
+        }
+      } catch {
+        // MCP list might fail, that's ok
+      }
+
+      this.statusBarItem.text = `$(beaker) rolecraft v${version} | ${skillCount} skills | ${mcpCount} MCP`
+      this.statusBarItem.tooltip = `RoleCraft v${version}\nSkills: ${skillCount}\nMCP Servers: ${mcpCount}`
       this.statusBarItem.show()
     } catch (error) {
       if (error instanceof RoleCraftNotFoundError) {
         this.statusBarItem.text = '$(beaker) rolecraft (CLI not found)'
         this.statusBarItem.tooltip = 'RoleCraft CLI not found. Install it or configure the path.'
-        this.statusBarItem.show()
+      } else {
+        this.statusBarItem.text = '$(beaker) rolecraft (error)'
+        this.statusBarItem.tooltip = `RoleCraft error: ${error instanceof Error ? error.message : 'Unknown error'}`
       }
+      this.statusBarItem.show()
     }
   }
 
