@@ -3,30 +3,28 @@ import type { Profile } from '../types.js'
 import { runRolecraftJson } from '../utils/cli.js'
 import { RoleCraftNotFoundError } from '../utils/errors.js'
 
-type ProfileTreeItemElement = { type: 'root' } | { type: 'profile'; profile: Profile }
+interface ProfileElement {
+  name: string
+  active: boolean
+  agents: string[]
+  skillCount: number
+}
 
-export class ProfileTreeProvider implements vscode.TreeDataProvider<ProfileTreeItemElement> {
-  private _onDidChangeTreeData = new vscode.EventEmitter<ProfileTreeItemElement | undefined>()
+export class ProfileTreeProvider implements vscode.TreeDataProvider<ProfileElement> {
+  private _onDidChangeTreeData = new vscode.EventEmitter<ProfileElement | undefined>()
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event
 
   refresh(): void {
     this._onDidChangeTreeData.fire(undefined)
   }
 
-  getTreeItem(element: ProfileTreeItemElement): vscode.TreeItem {
-    if (element.type === 'root') {
-      const item = new vscode.TreeItem('Profiles', vscode.TreeItemCollapsibleState.Expanded)
-      item.iconPath = new vscode.ThemeIcon('account')
-      return item
-    }
-
-    const { profile } = element
-    const label = profile.active ? `${profile.name} (active)` : profile.name
+  getTreeItem(element: ProfileElement): vscode.TreeItem {
+    const label = element.active ? `${element.name} (active)` : element.name
     const item = new vscode.TreeItem(label, vscode.TreeItemCollapsibleState.None)
-    item.description = `${profile.skillCount} skills, ${profile.agents.length} agents`
-    item.contextValue = profile.active ? 'profileActive' : 'profileInactive'
+    item.description = `${element.skillCount} skills, ${element.agents.length} agents`
+    item.contextValue = element.active ? 'profileActive' : 'profileInactive'
 
-    if (profile.active) {
+    if (element.active) {
       item.iconPath = new vscode.ThemeIcon('star-full')
     } else {
       item.iconPath = new vscode.ThemeIcon('star-empty')
@@ -35,25 +33,22 @@ export class ProfileTreeProvider implements vscode.TreeDataProvider<ProfileTreeI
     return item
   }
 
-  async getChildren(element?: ProfileTreeItemElement): Promise<ProfileTreeItemElement[]> {
-    if (!element) {
-      return [{ type: 'root' }]
-    }
-
-    if (element.type === 'root') {
-      try {
-        const profiles = await runRolecraftJson<Profile[]>(['profile', 'list'])
-        return profiles.map((profile) => ({ type: 'profile' as const, profile }))
-      } catch (error) {
-        if (error instanceof RoleCraftNotFoundError) {
-          vscode.window.showErrorMessage(
-            'RoleCraft CLI not found. Please install it or configure the executable path.',
-          )
-        }
-        return []
+  async getChildren(): Promise<ProfileElement[]> {
+    try {
+      const result = await runRolecraftJson<Profile[]>(['profile', 'list'])
+      return result.map((profile) => ({
+        name: profile.name,
+        active: profile.active,
+        agents: profile.agents,
+        skillCount: profile.skillCount,
+      }))
+    } catch (error) {
+      if (error instanceof RoleCraftNotFoundError) {
+        vscode.window.showErrorMessage(
+          'RoleCraft CLI not found. Please install it or configure the executable path.',
+        )
       }
+      return []
     }
-
-    return []
   }
 }
