@@ -3,14 +3,22 @@ import { MCPTreeProvider } from './providers/mcpTreeProvider.js'
 import { ProfileTreeProvider } from './providers/profileTreeProvider.js'
 import { SkillTreeProvider } from './providers/skillTreeProvider.js'
 import { StatusBarProvider } from './providers/statusBarProvider.js'
+import { runRolecraft } from './utils/cli.js'
+import { getConfig, onConfigChange } from './utils/config.js'
+import { RoleCraftNotFoundError } from './utils/errors.js'
 
-export function activate(context: vscode.ExtensionContext) {
+let skillProvider: SkillTreeProvider | undefined
+let mcpProvider: MCPTreeProvider | undefined
+let profileProvider: ProfileTreeProvider | undefined
+let statusBar: StatusBarProvider | undefined
+
+export async function activate(context: vscode.ExtensionContext): Promise<void> {
   console.log('RoleCraft extension is now active')
 
-  const skillProvider = new SkillTreeProvider()
-  const mcpProvider = new MCPTreeProvider()
-  const profileProvider = new ProfileTreeProvider()
-  const statusBar = new StatusBarProvider()
+  skillProvider = new SkillTreeProvider()
+  mcpProvider = new MCPTreeProvider()
+  profileProvider = new ProfileTreeProvider()
+  statusBar = new StatusBarProvider()
 
   const treeViews = [
     vscode.window.registerTreeDataProvider('rolecraft.skills', skillProvider),
@@ -26,7 +34,7 @@ export function activate(context: vscode.ExtensionContext) {
       vscode.window.showInformationMessage('RoleCraft: Search Skills - Coming soon')
     }),
     vscode.commands.registerCommand('rolecraft.list', () => {
-      skillProvider.refresh()
+      skillProvider?.refresh()
     }),
     vscode.commands.registerCommand('rolecraft.remove', () => {
       vscode.window.showInformationMessage('RoleCraft: Remove Skill - Coming soon')
@@ -65,8 +73,41 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(statusBar, ...treeViews, ...commands)
 
-  const config = vscode.workspace.getConfiguration('rolecraft')
-  statusBar.start(config.get<boolean>('showStatusBar', true))
+  context.subscriptions.push(
+    onConfigChange((config) => {
+      if (config.showStatusBar) {
+        statusBar?.start(true)
+      } else {
+        statusBar?.stop()
+      }
+    }),
+  )
+
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeWorkspaceFolders(() => {
+      skillProvider?.refresh()
+      mcpProvider?.refresh()
+      profileProvider?.refresh()
+    }),
+  )
+
+  try {
+    await runRolecraft(['--version'])
+  } catch (error) {
+    if (error instanceof RoleCraftNotFoundError) {
+      vscode.window.showWarningMessage(
+        'RoleCraft CLI not found. Please install it or configure the executable path in settings.',
+      )
+    }
+  }
+
+  const config = getConfig()
+  statusBar.start(config.showStatusBar)
 }
 
-export function deactivate() {}
+export function deactivate(): void {
+  skillProvider = undefined
+  mcpProvider = undefined
+  profileProvider = undefined
+  statusBar = undefined
+}
