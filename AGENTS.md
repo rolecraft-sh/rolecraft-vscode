@@ -1,6 +1,6 @@
 # rolecraft-vscode — Development Guidelines
 
-> VS Code extension for RoleCraft CLI — AI agent skill manager
+> VS Code extension for RoleCraft CLI — The Security-First Skill Manager for AI Agents
 
 ## ⚠️ STARTUP CHECKLIST (read before every task)
 
@@ -55,6 +55,7 @@ All agents must follow the same rules defined in this document.
 Format: `type(scope): description`
 
 Types:
+
 - `feat:` — New feature
 - `fix:` — Bug fix
 - `chore:` — Maintenance task
@@ -65,6 +66,7 @@ Types:
 - `style:` — Code style (formatting, no logic change)
 
 Examples:
+
 ```
 feat: add skill tree provider
 fix: resolve MCP server status display

@@ -1,0 +1,186 @@
+{
+  "name": "rolecraft",
+  "displayName": "RoleCraft - The Security-First Skill Manager for AI Agents",
+  "description": "Install, manage, and discover AI agent skills from VS Code",
+  "version": "0.1.0",
+  "publisher": "rolecraft-sh",
+  "icon": "media/icon.png",
+  "author": {
+    "name": "rolecraft-sh"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rolecraft-sh/rolecraft-vscode.git"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Other", "Extension Packs"],
+  "activationEvents": [
+    "onView:rolecraft.skills",
+    "onView:rolecraft.mcp",
+    "onView:rolecraft.profiles"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "rolecraft.install",
+        "title": "Install Skill",
+        "category": "RoleCraft"
+      },
+      {
+        "command": "rolecraft.search",
+        "title": "Search Skills",
+        "category": "RoleCraft"
+      },
+      {
+        "command": "rolecraft.list",
+        "title": "List Skills",
+        "category": "RoleCraft"
+      },
+      {
+        "command": "rolecraft.remove",
+        "title": "Remove Skill",
+        "category": "RoleCraft"
+      },
+      {
+        "command": "rolecraft.doctor",
+        "title": "Doctor",
+        "category": "RoleCraft"
+      },
+      {
+        "command": "rolecraft.test",
+        "title": "Test Skill",
+        "category": "RoleCraft"
+      },
+      {
+        "command": "rolecraft.init",
+        "title": "Init New Skill",
+        "category": "RoleCraft"
+      },
+      {
+        "command": "rolecraft.mcp.install",
+        "title": "Install MCP Server",
+        "category": "RoleCraft"
+      },
+      {
+        "command": "rolecraft.mcp.start",
+        "title": "Start MCP Server",
+        "category": "RoleCraft"
+      },
+      {
+        "command": "rolecraft.mcp.stop",
+        "title": "Stop MCP Server",
+        "category": "RoleCraft"
+      },
+      {
+        "command": "rolecraft.mcp.remove",
+        "title": "Remove MCP Server",
+        "category": "RoleCraft"
+      },
+      {
+        "command": "rolecraft.profile.save",
+        "title": "Save Profile",
+        "category": "RoleCraft"
+      },
+      {
+        "command": "rolecraft.profile.apply",
+        "title": "Apply Profile",
+        "category": "RoleCraft"
+      },
+      {
+        "command": "rolecraft.profile.delete",
+        "title": "Delete Profile",
+        "category": "RoleCraft"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "rolecraft",
+          "title": "RoleCraft",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "rolecraft": [
+        {
+          "id": "rolecraft.skills",
+          "name": "Skills"
+        },
+        {
+          "id": "rolecraft.mcp",
+          "name": "MCP Servers"
+        },
+        {
+          "id": "rolecraft.profiles",
+          "name": "Profiles"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "RoleCraft",
+      "properties": {
+        "rolecraft.executablePath": {
+          "type": "string",
+          "default": "rolecraft",
+          "description": "Path to RoleCraft CLI executable"
+        },
+        "rolecraft.autoDetectAgents": {
+          "type": "boolean",
+          "default": true,
+          "description": "Auto-detect installed AI agents"
+        },
+        "rolecraft.defaultAgents": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": ["cursor", "claude-code"],
+          "description": "Default agents for skill installation"
+        },
+        "rolecraft.showStatusBar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show status bar item"
+        },
+        "rolecraft.autoRefresh": {
+          "type": "boolean",
+          "default": true,
+          "description": "Auto-refresh tree views on changes"
+        },
+        "rolecraft.securityNotification": {
+          "type": "string",
+          "enum": ["warning", "error", "off"],
+          "default": "warning",
+          "description": "Security notification level"
+        },
+        "rolecraft.registryUrl": {
+          "type": "string",
+          "default": "https://registry.rolecraft.sh",
+          "description": "Skill registry URL"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "node esbuild.js",
+    "watch": "node esbuild.js --watch",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "test": "node --test --test-concurrency=1",
+    "package": "vsce package --no-dependencies",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.0.0",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.5.0"
+  }
+}
