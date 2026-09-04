@@ -172,7 +172,7 @@
     "watch": "node esbuild.js --watch",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
-    "test": "node --test --test-concurrency=1",
+    "test": "npx tsx --test --test-concurrency=1 src/**/*.test.ts",
     "package": "vsce package --no-dependencies",
     "publish": "vsce publish"
   },
