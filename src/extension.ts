@@ -2,6 +2,7 @@ import * as vscode from 'vscode'
 import { MCPTreeProvider } from './providers/mcpTreeProvider.js'
 import { ProfileTreeProvider } from './providers/profileTreeProvider.js'
 import { SkillTreeProvider } from './providers/skillTreeProvider.js'
+import { StatusBarProvider } from './providers/statusBarProvider.js'
 
 export function activate(context: vscode.ExtensionContext) {
   console.log('RoleCraft extension is now active')
@@ -9,6 +10,7 @@ export function activate(context: vscode.ExtensionContext) {
   const skillProvider = new SkillTreeProvider()
   const mcpProvider = new MCPTreeProvider()
   const profileProvider = new ProfileTreeProvider()
+  const statusBar = new StatusBarProvider()
 
   const treeViews = [
     vscode.window.registerTreeDataProvider('rolecraft.skills', skillProvider),
@@ -61,7 +63,10 @@ export function activate(context: vscode.ExtensionContext) {
     }),
   ]
 
-  context.subscriptions.push(...treeViews, ...commands)
+  context.subscriptions.push(statusBar, ...treeViews, ...commands)
+
+  const config = vscode.workspace.getConfiguration('rolecraft')
+  statusBar.start(config.get<boolean>('showStatusBar', true))
 }
 
 export function deactivate() {}
