@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Install MCP Server command with debounced GitHub/npm search and multi-agent selection
+- Remove MCP Server command with confirmation dialog and tree view refresh
+- MCP tree view title and context menu actions (install, remove)
+- Shared MCP list/search output parsing utilities with unit tests
+
 ## [0.1.0] - 2026-09-07
 
 ### Added

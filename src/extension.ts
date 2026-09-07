@@ -3,6 +3,7 @@ import { registerDoctorCommand } from './commands/doctor.js'
 import { registerInitCommand } from './commands/init.js'
 import { registerInstallCommand } from './commands/install.js'
 import { registerListCommand } from './commands/list.js'
+import { registerMCPCommands } from './commands/mcp.js'
 import { registerRemoveCommand } from './commands/remove.js'
 import { registerSearchCommand } from './commands/search.js'
 import { registerTestCommand } from './commands/test.js'
@@ -27,12 +28,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   profileProvider = new ProfileTreeProvider()
   statusBar = new StatusBarProvider()
 
-  const treeViews = [
-    vscode.window.registerTreeDataProvider('rolecraft.skills', skillProvider),
-    vscode.window.registerTreeDataProvider('rolecraft.mcp', mcpProvider),
-    vscode.window.registerTreeDataProvider('rolecraft.profiles', profileProvider),
-  ]
-
   registerInstallCommand(context)
   registerSearchCommand(context)
   registerListCommand(context)
@@ -40,32 +35,18 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   registerDoctorCommand(context)
   registerTestCommand(context)
   registerInitCommand(context)
+  registerMCPCommands(context, () => mcpProvider?.refresh())
 
-  const commands = [
-    vscode.commands.registerCommand('rolecraft.mcp.install', () => {
-      vscode.window.showInformationMessage('RoleCraft: Install MCP Server - Coming soon')
-    }),
-    vscode.commands.registerCommand('rolecraft.mcp.start', () => {
-      vscode.window.showInformationMessage('RoleCraft: Start MCP Server - Coming soon')
-    }),
-    vscode.commands.registerCommand('rolecraft.mcp.stop', () => {
-      vscode.window.showInformationMessage('RoleCraft: Stop MCP Server - Coming soon')
-    }),
-    vscode.commands.registerCommand('rolecraft.mcp.remove', () => {
-      vscode.window.showInformationMessage('RoleCraft: Remove MCP Server - Coming soon')
-    }),
-    vscode.commands.registerCommand('rolecraft.profile.save', () => {
-      vscode.window.showInformationMessage('RoleCraft: Save Profile - Coming soon')
-    }),
-    vscode.commands.registerCommand('rolecraft.profile.apply', () => {
-      vscode.window.showInformationMessage('RoleCraft: Apply Profile - Coming soon')
-    }),
-    vscode.commands.registerCommand('rolecraft.profile.delete', () => {
-      vscode.window.showInformationMessage('RoleCraft: Delete Profile - Coming soon')
-    }),
-  ]
+  registerProfilePlaceholderCommand(context, 'rolecraft.profile.save', 'Save Profile')
+  registerProfilePlaceholderCommand(context, 'rolecraft.profile.apply', 'Apply Profile')
+  registerProfilePlaceholderCommand(context, 'rolecraft.profile.delete', 'Delete Profile')
 
-  context.subscriptions.push(statusBar, ...treeViews, ...commands)
+  context.subscriptions.push(
+    statusBar,
+    vscode.window.registerTreeDataProvider('rolecraft.skills', skillProvider),
+    vscode.window.registerTreeDataProvider('rolecraft.mcp', mcpProvider),
+    vscode.window.registerTreeDataProvider('rolecraft.profiles', profileProvider),
+  )
 
   context.subscriptions.push(
     onConfigChange((config) => {
@@ -97,6 +78,18 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
   const config = getConfig()
   statusBar.start(config.showStatusBar)
+}
+
+function registerProfilePlaceholderCommand(
+  context: vscode.ExtensionContext,
+  command: string,
+  title: string,
+): void {
+  context.subscriptions.push(
+    vscode.commands.registerCommand(command, () => {
+      vscode.window.showInformationMessage(`RoleCraft: ${title} - Coming soon`)
+    }),
+  )
 }
 
 export function deactivate(): void {
