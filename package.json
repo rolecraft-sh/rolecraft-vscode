@@ -26,8 +26,6 @@
     "onCommand:rolecraft.test",
     "onCommand:rolecraft.init",
     "onCommand:rolecraft.mcp.install",
-    "onCommand:rolecraft.mcp.start",
-    "onCommand:rolecraft.mcp.stop",
     "onCommand:rolecraft.mcp.remove",
     "onCommand:rolecraft.profile.save",
     "onCommand:rolecraft.profile.apply",
@@ -80,16 +78,6 @@
         "category": "RoleCraft"
       },
       {
-        "command": "rolecraft.mcp.start",
-        "title": "Start MCP Server",
-        "category": "RoleCraft"
-      },
-      {
-        "command": "rolecraft.mcp.stop",
-        "title": "Stop MCP Server",
-        "category": "RoleCraft"
-      },
-      {
         "command": "rolecraft.mcp.remove",
         "title": "Remove MCP Server",
         "category": "RoleCraft"
@@ -132,6 +120,22 @@
         {
           "id": "rolecraft.profiles",
           "name": "Profiles"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "rolecraft.mcp.install",
+          "when": "view == rolecraft.mcp",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "rolecraft.mcp.remove",
+          "when": "view == rolecraft.mcp && viewItem == mcpServer",
+          "group": "inline"
         }
       ]
     },
