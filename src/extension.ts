@@ -8,6 +8,7 @@ import { ACTIVE_PROFILE_KEY, registerProfileCommands } from './commands/profile.
 import { registerRemoveCommand } from './commands/remove.js'
 import { registerSearchCommand } from './commands/search.js'
 import { registerTestCommand } from './commands/test.js'
+import { SkillCompletionProvider } from './language/skillCompletion.js'
 import { MCPTreeProvider } from './providers/mcpTreeProvider.js'
 import { ProfileTreeProvider } from './providers/profileTreeProvider.js'
 import { SkillTreeProvider } from './providers/skillTreeProvider.js'
@@ -36,6 +37,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   registerDoctorCommand(context)
   registerTestCommand(context)
   registerInitCommand(context)
+
   registerMCPCommands(context, () => mcpProvider?.refresh())
   registerProfileCommands(context, {
     onProfileChanged: () => profileProvider?.refresh(),
@@ -47,12 +49,34 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     onActiveProfileChange: (name) => statusBar?.setActiveProfile(name),
   })
 
+  const config = getConfig()
+
+  const completionProvider = new SkillCompletionProvider({
+    agents: config.defaultAgents,
+    mcpServers: [],
+  })
+
   context.subscriptions.push(
     statusBar,
+    completionProvider,
     vscode.window.registerTreeDataProvider('rolecraft.skills', skillProvider),
     vscode.window.registerTreeDataProvider('rolecraft.mcp', mcpProvider),
     vscode.window.registerTreeDataProvider('rolecraft.profiles', profileProvider),
   )
+
+  context.subscriptions.push(completionProvider.register(context))
+
+  onConfigChange((updatedConfig) => {
+    completionProvider.updateOptions({
+      agents: updatedConfig.defaultAgents,
+      mcpServers: [],
+    })
+    if (updatedConfig.showStatusBar) {
+      statusBar?.start(true)
+    } else {
+      statusBar?.stop()
+    }
+  })
 
   context.subscriptions.push(
     onConfigChange((config) => {
@@ -82,7 +106,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     }
   }
 
-  const config = getConfig()
   statusBar.setActiveProfile(context.globalState.get<string>(ACTIVE_PROFILE_KEY))
   statusBar.start(config.showStatusBar)
 }
