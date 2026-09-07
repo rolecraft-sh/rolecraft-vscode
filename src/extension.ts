@@ -1,5 +1,6 @@
 import * as vscode from 'vscode'
 import { registerInstallCommand } from './commands/install.js'
+import { registerSearchCommand } from './commands/search.js'
 import { MCPTreeProvider } from './providers/mcpTreeProvider.js'
 import { ProfileTreeProvider } from './providers/profileTreeProvider.js'
 import { SkillTreeProvider } from './providers/skillTreeProvider.js'
@@ -28,11 +29,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   ]
 
   registerInstallCommand(context)
+  registerSearchCommand(context)
 
   const commands = [
-    vscode.commands.registerCommand('rolecraft.search', () => {
-      vscode.window.showInformationMessage('RoleCraft: Search Skills - Coming soon')
-    }),
     vscode.commands.registerCommand('rolecraft.list', () => {
       skillProvider?.refresh()
     }),
