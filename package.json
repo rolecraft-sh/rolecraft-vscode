@@ -36,6 +36,13 @@
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "languages": [
+      {
+        "id": "skill",
+        "aliases": ["SKILL", "skill"],
+        "extensions": [".skill.md"]
+      }
+    ],
     "commands": [
       {
         "command": "rolecraft.install",

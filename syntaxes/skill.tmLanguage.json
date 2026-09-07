@@ -1,0 +1,21 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "scopeName": "text.skill",
+  "name": "SKILL.md",
+  "patterns": [
+    {
+      "include": "#frontmatter"
+    },
+    {
+      "include": "text.html.markdown"
+    }
+  ],
+  "repository": {
+    "frontmatter": {
+      "begin": "^---\\s*$",
+      "end": "^---\\s*$",
+      "contentName": "source.yaml",
+      "patterns": [{ "include": "source.yaml" }]
+    }
+  }
+}

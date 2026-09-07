@@ -1,0 +1,7 @@
+{
+  "id": "skill",
+  "aliases": ["SKILL", "skill"],
+  "extensions": [".skill.md"],
+  "configuration": "./language-configuration.json",
+  "firstLine": "^---\\s*$"
+}
