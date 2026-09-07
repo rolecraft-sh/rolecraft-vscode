@@ -67,18 +67,18 @@ export class SkillCompletionProvider implements vscode.CompletionItemProvider {
       if (value === '' || value.endsWith(' ')) {
         if (key === 'category') {
           for (const cat of CATEGORY_OPTIONS) {
-            items.push(this.createValueItem(cat, vscode.CompletionItemKind.Value))
+            items.push(this.createValueItem(cat, vscode.CompletionItemKind.Value, position))
           }
         } else if (key === 'agents') {
           for (const agent of this.agents) {
-            items.push(this.createValueItem(agent, vscode.CompletionItemKind.Value))
+            items.push(this.createValueItem(agent, vscode.CompletionItemKind.Value, position))
           }
         } else if (key === 'mcp_servers') {
           for (const server of this.mcpServers) {
-            items.push(this.createValueItem(server, vscode.CompletionItemKind.Value))
+            items.push(this.createValueItem(server, vscode.CompletionItemKind.Value, position))
           }
         } else if (key === 'version') {
-          items.push(this.createValueItem('1.0.0', vscode.CompletionItemKind.Value))
+          items.push(this.createValueItem('1.0.0', vscode.CompletionItemKind.Value, position))
         }
       }
 
@@ -137,7 +137,11 @@ export class SkillCompletionProvider implements vscode.CompletionItemProvider {
     return position.isAfterOrEqual(range.start) && position.isBeforeOrEqual(range.end)
   }
 
-  private createValueItem(value: string, kind: vscode.CompletionItemKind): vscode.CompletionItem {
+  private createValueItem(
+    value: string,
+    kind: vscode.CompletionItemKind,
+    position: vscode.Position,
+  ): vscode.CompletionItem {
     const item = new vscode.CompletionItem(value, kind)
     item.insertText = value
     item.range = new vscode.Range(position, position)
