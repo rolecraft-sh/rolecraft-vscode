@@ -1,6 +1,11 @@
 import * as vscode from 'vscode'
+import { registerDoctorCommand } from './commands/doctor.js'
+import { registerInitCommand } from './commands/init.js'
 import { registerInstallCommand } from './commands/install.js'
+import { registerListCommand } from './commands/list.js'
+import { registerRemoveCommand } from './commands/remove.js'
 import { registerSearchCommand } from './commands/search.js'
+import { registerTestCommand } from './commands/test.js'
 import { MCPTreeProvider } from './providers/mcpTreeProvider.js'
 import { ProfileTreeProvider } from './providers/profileTreeProvider.js'
 import { SkillTreeProvider } from './providers/skillTreeProvider.js'
@@ -30,23 +35,13 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
   registerInstallCommand(context)
   registerSearchCommand(context)
+  registerListCommand(context)
+  registerRemoveCommand(context, () => skillProvider?.refresh())
+  registerDoctorCommand(context)
+  registerTestCommand(context)
+  registerInitCommand(context)
 
   const commands = [
-    vscode.commands.registerCommand('rolecraft.list', () => {
-      skillProvider?.refresh()
-    }),
-    vscode.commands.registerCommand('rolecraft.remove', () => {
-      vscode.window.showInformationMessage('RoleCraft: Remove Skill - Coming soon')
-    }),
-    vscode.commands.registerCommand('rolecraft.doctor', () => {
-      vscode.window.showInformationMessage('RoleCraft: Doctor - Coming soon')
-    }),
-    vscode.commands.registerCommand('rolecraft.test', () => {
-      vscode.window.showInformationMessage('RoleCraft: Test Skill - Coming soon')
-    }),
-    vscode.commands.registerCommand('rolecraft.init', () => {
-      vscode.window.showInformationMessage('RoleCraft: Init New Skill - Coming soon')
-    }),
     vscode.commands.registerCommand('rolecraft.mcp.install', () => {
       vscode.window.showInformationMessage('RoleCraft: Install MCP Server - Coming soon')
     }),
