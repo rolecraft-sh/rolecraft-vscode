@@ -11,6 +11,7 @@ interface SkillListResult {
 export class StatusBarProvider implements vscode.Disposable {
   private statusBarItem: vscode.StatusBarItem
   private refreshTimer: ReturnType<typeof setInterval> | undefined
+  private activeProfile: string | undefined
   private disposables: vscode.Disposable[] = []
 
   constructor() {
@@ -51,6 +52,11 @@ export class StatusBarProvider implements vscode.Disposable {
     }
   }
 
+  setActiveProfile(name: string | undefined): void {
+    this.activeProfile = name
+    void this.update()
+  }
+
   async update(): Promise<void> {
     const config = getConfig()
 
@@ -75,8 +81,12 @@ export class StatusBarProvider implements vscode.Disposable {
         // MCP list might fail, that's ok
       }
 
-      this.statusBarItem.text = `$(beaker) rolecraft v${version} | ${skillCount} skills | ${mcpCount} MCP`
-      this.statusBarItem.tooltip = `RoleCraft v${version}\nSkills: ${skillCount}\nMCP Servers: ${mcpCount}`
+      const profileText = this.activeProfile ? ` | ${this.activeProfile}` : ''
+      this.statusBarItem.text = `$(beaker) rolecraft v${version} | ${skillCount} skills | ${mcpCount} MCP${profileText}`
+      const profileTooltip = this.activeProfile
+        ? `\nActive Profile: ${this.activeProfile}`
+        : '\nActive Profile: none'
+      this.statusBarItem.tooltip = `RoleCraft v${version}\nSkills: ${skillCount}\nMCP Servers: ${mcpCount}${profileTooltip}`
       this.statusBarItem.show()
     } catch (error) {
       if (error instanceof RoleCraftNotFoundError) {
@@ -95,6 +105,8 @@ export class StatusBarProvider implements vscode.Disposable {
       { label: '$(download) Install Skill', description: 'Install a new skill' },
       { label: '$(list) List Skills', description: 'List installed skills' },
       { label: '$(pulse) Run Doctor', description: 'Check system health' },
+      { label: '$(star) Switch Profile', description: 'Apply a saved profile' },
+      { label: '$(save) Save Profile', description: 'Save current configuration as a profile' },
       { label: '$(gear) Open Settings', description: 'Open RoleCraft settings' },
       { label: '$(refresh) Refresh Status', description: 'Refresh status bar' },
     ]
@@ -111,6 +123,10 @@ export class StatusBarProvider implements vscode.Disposable {
       vscode.commands.executeCommand('rolecraft.list')
     } else if (selected.label.includes('Run Doctor')) {
       vscode.commands.executeCommand('rolecraft.doctor')
+    } else if (selected.label.includes('Switch Profile')) {
+      vscode.commands.executeCommand('rolecraft.profile.apply')
+    } else if (selected.label.includes('Save Profile')) {
+      vscode.commands.executeCommand('rolecraft.profile.save')
     } else if (selected.label.includes('Open Settings')) {
       vscode.commands.executeCommand('workbench.action.openSettings', 'rolecraft')
     } else if (selected.label.includes('Refresh Status')) {

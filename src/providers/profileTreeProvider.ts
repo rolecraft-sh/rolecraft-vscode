@@ -1,47 +1,35 @@
 import * as vscode from 'vscode'
-import type { Profile } from '../types.js'
-import { runRolecraftJson } from '../utils/cli.js'
+import { runRolecraft } from '../utils/cli.js'
 import { RoleCraftNotFoundError } from '../utils/errors.js'
+import { type ProfileSummary, parseProfileList } from '../utils/profile.js'
 
-interface ProfileElement {
-  name: string
-  active: boolean
-  agents: string[]
-  skillCount: number
-}
-
-export class ProfileTreeProvider implements vscode.TreeDataProvider<ProfileElement> {
-  private _onDidChangeTreeData = new vscode.EventEmitter<ProfileElement | undefined>()
+export class ProfileTreeProvider implements vscode.TreeDataProvider<ProfileSummary> {
+  private _onDidChangeTreeData = new vscode.EventEmitter<ProfileSummary | undefined>()
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event
 
   refresh(): void {
     this._onDidChangeTreeData.fire(undefined)
   }
 
-  getTreeItem(element: ProfileElement): vscode.TreeItem {
-    const label = element.active ? `${element.name} (active)` : element.name
-    const item = new vscode.TreeItem(label, vscode.TreeItemCollapsibleState.None)
-    item.description = `${element.skillCount} skills, ${element.agents.length} agents`
-    item.contextValue = element.active ? 'profileActive' : 'profileInactive'
-
-    if (element.active) {
-      item.iconPath = new vscode.ThemeIcon('star-full')
-    } else {
-      item.iconPath = new vscode.ThemeIcon('star-empty')
-    }
+  getTreeItem(element: ProfileSummary): vscode.TreeItem {
+    const item = new vscode.TreeItem(element.name, vscode.TreeItemCollapsibleState.None)
+    item.description = `${element.agentCount} agent(s)`
+    item.tooltip = [
+      element.description ?? undefined,
+      element.updatedAt ? `Updated: ${element.updatedAt}` : undefined,
+    ]
+      .filter((line): line is string => line !== undefined)
+      .join('\n')
+    item.contextValue = 'profileSaved'
+    item.iconPath = new vscode.ThemeIcon('star-full')
 
     return item
   }
 
-  async getChildren(): Promise<ProfileElement[]> {
+  async getChildren(): Promise<ProfileSummary[]> {
     try {
-      const result = await runRolecraftJson<Profile[]>(['profile', 'list'])
-      return result.map((profile) => ({
-        name: profile.name,
-        active: profile.active,
-        agents: profile.agents,
-        skillCount: profile.skillCount,
-      }))
+      const output = await runRolecraft(['profile', 'list'])
+      return parseProfileList(output)
     } catch (error) {
       if (error instanceof RoleCraftNotFoundError) {
         vscode.window.showErrorMessage(

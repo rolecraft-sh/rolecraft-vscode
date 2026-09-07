@@ -6,7 +6,7 @@ VS Code extension for [RoleCraft CLI](https://github.com/rolecraft-sh/rolecraft)
 
 - **Skill Management** — Install, list, remove, and search skills from the sidebar
 - **MCP Server Management** — Install, remove, and manage MCP servers from the sidebar
-- **Profile Switcher** — Save and apply skill configurations
+- **Profile Switcher** — Save, apply, and delete agent configuration profiles
 - **SKILL.md Support** — Syntax highlighting, autocomplete, and validation
 - **Security Scanning** — View security reports before installing skills
 
@@ -50,6 +50,9 @@ VS Code extension for [RoleCraft CLI](https://github.com/rolecraft-sh/rolecraft)
 | `RoleCraft: Init New Skill` | Create a new SKILL.md file              |
 | `RoleCraft: Install MCP Server` | Search and install MCP servers       |
 | `RoleCraft: Remove MCP Server`  | Remove an installed MCP server       |
+| `RoleCraft: Save Profile`  | Save current configuration as a profile |
+| `RoleCraft: Apply Profile` | Apply a saved profile                 |
+| `RoleCraft: Delete Profile` | Delete a saved profile                 |
 
 ## Configuration
 

@@ -4,6 +4,7 @@ import { registerInitCommand } from './commands/init.js'
 import { registerInstallCommand } from './commands/install.js'
 import { registerListCommand } from './commands/list.js'
 import { registerMCPCommands } from './commands/mcp.js'
+import { ACTIVE_PROFILE_KEY, registerProfileCommands } from './commands/profile.js'
 import { registerRemoveCommand } from './commands/remove.js'
 import { registerSearchCommand } from './commands/search.js'
 import { registerTestCommand } from './commands/test.js'
@@ -36,10 +37,15 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   registerTestCommand(context)
   registerInitCommand(context)
   registerMCPCommands(context, () => mcpProvider?.refresh())
-
-  registerProfilePlaceholderCommand(context, 'rolecraft.profile.save', 'Save Profile')
-  registerProfilePlaceholderCommand(context, 'rolecraft.profile.apply', 'Apply Profile')
-  registerProfilePlaceholderCommand(context, 'rolecraft.profile.delete', 'Delete Profile')
+  registerProfileCommands(context, {
+    onProfileChanged: () => profileProvider?.refresh(),
+    onAllChanged: () => {
+      skillProvider?.refresh()
+      mcpProvider?.refresh()
+      profileProvider?.refresh()
+    },
+    onActiveProfileChange: (name) => statusBar?.setActiveProfile(name),
+  })
 
   context.subscriptions.push(
     statusBar,
@@ -77,19 +83,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   }
 
   const config = getConfig()
+  statusBar.setActiveProfile(context.globalState.get<string>(ACTIVE_PROFILE_KEY))
   statusBar.start(config.showStatusBar)
-}
-
-function registerProfilePlaceholderCommand(
-  context: vscode.ExtensionContext,
-  command: string,
-  title: string,
-): void {
-  context.subscriptions.push(
-    vscode.commands.registerCommand(command, () => {
-      vscode.window.showInformationMessage(`RoleCraft: ${title} - Coming soon`)
-    }),
-  )
 }
 
 export function deactivate(): void {
