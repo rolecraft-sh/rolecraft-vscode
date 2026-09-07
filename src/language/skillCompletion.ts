@@ -151,4 +151,8 @@ export class SkillCompletionProvider implements vscode.CompletionItemProvider {
   register(_context: vscode.ExtensionContext): vscode.Disposable {
     return vscode.languages.registerCompletionItemProvider('skill', this, ':', ' ')
   }
+
+  dispose(): void {
+    // No-op - disposables are managed by VS Code
+  }
 }
