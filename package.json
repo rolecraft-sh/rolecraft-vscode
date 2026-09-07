@@ -129,12 +129,27 @@
           "command": "rolecraft.mcp.install",
           "when": "view == rolecraft.mcp",
           "group": "navigation"
+        },
+        {
+          "command": "rolecraft.profile.save",
+          "when": "view == rolecraft.profiles",
+          "group": "navigation"
         }
       ],
       "view/item/context": [
         {
           "command": "rolecraft.mcp.remove",
           "when": "view == rolecraft.mcp && viewItem == mcpServer",
+          "group": "inline"
+        },
+        {
+          "command": "rolecraft.profile.apply",
+          "when": "view == rolecraft.profiles && viewItem == profileSaved",
+          "group": "inline"
+        },
+        {
+          "command": "rolecraft.profile.delete",
+          "when": "view == rolecraft.profiles && viewItem == profileSaved",
           "group": "inline"
         }
       ]

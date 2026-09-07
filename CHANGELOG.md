@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove MCP Server command with confirmation dialog and tree view refresh
 - MCP tree view title and context menu actions (install, remove)
 - Shared MCP list/search output parsing utilities with unit tests
+- Save Profile command with input validation
+- Apply Profile command with profile picker and all-view refresh
+- Delete Profile command with confirmation dialog
+- Active profile shown in the status bar with quick switch actions
+- Profiles tree view title and context menu actions (save, apply, delete)
+- Shared profile list output parsing utility with unit tests
 
 ## [0.1.0] - 2026-09-07
 
