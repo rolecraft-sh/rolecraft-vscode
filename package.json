@@ -2,7 +2,7 @@
   "name": "rolecraft",
   "displayName": "RoleCraft - The Security-First Skill Manager for AI Agents",
   "description": "Install, manage, and discover AI agent skills from VS Code",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "rolecraft-sh",
   "icon": "media/icon.png",
   "author": {
