@@ -8,6 +8,7 @@ export interface RoleCraftConfig {
   autoRefresh: boolean
   securityNotification: 'warning' | 'error' | 'off'
   registryUrl: string
+  validationEnabled: boolean
 }
 
 export function getConfig(): RoleCraftConfig {
@@ -24,6 +25,7 @@ export function getConfig(): RoleCraftConfig {
       'warning',
     ),
     registryUrl: config.get<string>('registryUrl', 'https://registry.rolecraft.sh'),
+    validationEnabled: config.get<boolean>('validation.enabled', true),
   }
 }
 
