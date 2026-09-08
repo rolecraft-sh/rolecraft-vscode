@@ -9,6 +9,7 @@ import { registerRemoveCommand } from './commands/remove.js'
 import { registerSearchCommand } from './commands/search.js'
 import { registerTestCommand } from './commands/test.js'
 import { SkillCompletionProvider } from './language/skillCompletion.js'
+import { SkillValidator } from './language/skillValidator.js'
 import { MCPTreeProvider } from './providers/mcpTreeProvider.js'
 import { ProfileTreeProvider } from './providers/profileTreeProvider.js'
 import { SkillTreeProvider } from './providers/skillTreeProvider.js'
@@ -56,21 +57,27 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     mcpServers: [],
   })
 
+  const validator = new SkillValidator()
+  validator.setEnabled(config.validationEnabled)
+
   context.subscriptions.push(
     statusBar,
     completionProvider,
+    validator,
     vscode.window.registerTreeDataProvider('rolecraft.skills', skillProvider),
     vscode.window.registerTreeDataProvider('rolecraft.mcp', mcpProvider),
     vscode.window.registerTreeDataProvider('rolecraft.profiles', profileProvider),
   )
 
   context.subscriptions.push(completionProvider.register(context))
+  context.subscriptions.push(validator.register(context))
 
   onConfigChange((updatedConfig) => {
     completionProvider.updateOptions({
       agents: updatedConfig.defaultAgents,
       mcpServers: [],
     })
+    validator.setEnabled(updatedConfig.validationEnabled)
     if (updatedConfig.showStatusBar) {
       statusBar?.start(true)
     } else {
