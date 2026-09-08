@@ -9,6 +9,7 @@ import { registerRemoveCommand } from './commands/remove.js'
 import { registerSearchCommand } from './commands/search.js'
 import { registerTestCommand } from './commands/test.js'
 import { SkillCompletionProvider } from './language/skillCompletion.js'
+import { SkillHoverProvider } from './language/skillHover.js'
 import { SkillValidator } from './language/skillValidator.js'
 import { MCPTreeProvider } from './providers/mcpTreeProvider.js'
 import { ProfileTreeProvider } from './providers/profileTreeProvider.js'
@@ -57,12 +58,15 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     mcpServers: [],
   })
 
+  const hoverProvider = new SkillHoverProvider()
+
   const validator = new SkillValidator()
   validator.setEnabled(config.validationEnabled)
 
   context.subscriptions.push(
     statusBar,
     completionProvider,
+    hoverProvider,
     validator,
     vscode.window.registerTreeDataProvider('rolecraft.skills', skillProvider),
     vscode.window.registerTreeDataProvider('rolecraft.mcp', mcpProvider),
@@ -71,6 +75,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
   context.subscriptions.push(completionProvider.register(context))
   context.subscriptions.push(validator.register(context))
+  context.subscriptions.push(vscode.languages.registerHoverProvider('skill', hoverProvider))
 
   onConfigChange((updatedConfig) => {
     completionProvider.updateOptions({
