@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-09-08
+
 ### Added
 - Install MCP Server command with debounced GitHub/npm search and multi-agent selection
 - Remove MCP Server command with confirmation dialog and tree view refresh
@@ -18,6 +20,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Active profile shown in the status bar with quick switch actions
 - Profiles tree view title and context menu actions (save, apply, delete)
 - Shared profile list output parsing utility with unit tests
+- SKILL.md syntax highlighting with TextMate grammar for YAML frontmatter
+- SKILL.md autocomplete for frontmatter fields and values
+- SKILL.md frontmatter validation with required field checks and format validation
+- SKILL.md hover provider for field documentation
+- Quick fix to convert invalid slugs to kebab-case
+- `rolecraft.validation.enabled` setting to toggle SKILL.md validation
 
 ## [0.1.0] - 2026-09-07
 
