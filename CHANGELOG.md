@@ -17,6 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `src/utils/securityScan.ts` — transforms `rolecraft test` output into `SecurityScanResult`
 - `src/utils/detailView.ts` — shared webview detail panel renderer
 - esbuild.mjs — extension + webview bundle (replaces esbuild.js)
+- Inline notification for clean installs — "Security scan passed" with green checkmark icon
+- `rolecraft.securityNotification` config wired: `warning` (medium+ issues), `error` (any issues), `off` (no notifications)
+- Block install on critical issues with error notification and report panel
+- Show "Scanning security..." progress indicator during install flow
+- Global scan cache for repeated installs (shared between install and tree view)
+- Security status icons in skill tree view (check/warning/error) with tooltip showing score
 
 ### Fixed
 - Install skill now installs only the selected skill (was installing all 52 from monorepo)
@@ -26,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Test Skill command renders result in both sidebar security report and editor webview panel
 - Sidebar security report view requires `"type": "webview"` in package.json for `resolveWebviewView` to fire
+- Install flow scans existing skill before installing; blocks on critical issues
 
 ## [0.2.0] - 2026-09-08
 
