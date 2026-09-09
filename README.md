@@ -17,18 +17,9 @@ VS Code extension for [RoleCraft CLI](https://github.com/rolecraft-sh/rolecraft)
 
 ## Installation
 
-### From VS Code Marketplace
-
-1. Open VS Code
-2. Go to Extensions (Ctrl+Shift+X)
-3. Search for "RoleCraft"
-4. Click Install
-
-### From .vsix
-
-1. Download the `.vsix` file from [Releases](https://github.com/rolecraft-sh/rolecraft-vscode/releases)
+1. Download the latest `.vsix` file from [Releases](https://github.com/rolecraft-sh/rolecraft-vscode/releases)
 2. Open VS Code
-3. Run `Extensions: Install from VSIX...` from the Command Palette
+3. Run `Extensions: Install from VSIX...` from the Command Palette (`Cmd+Shift+P` / `Ctrl+Shift+P`)
 4. Select the downloaded `.vsix` file
 
 ## Usage
