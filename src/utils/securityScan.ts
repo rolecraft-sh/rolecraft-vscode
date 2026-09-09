@@ -47,3 +47,17 @@ export function issueCount(
     low: result.issues.filter((i) => i.severity === 'low').length,
   }
 }
+
+const globalScanCache = new Map<string, SecurityScanResult>()
+
+export function getCachedScan(slug: string): SecurityScanResult | undefined {
+  return globalScanCache.get(slug)
+}
+
+export function setCachedScan(slug: string, result: SecurityScanResult): void {
+  globalScanCache.set(slug, result)
+}
+
+export function clearScanCache(): void {
+  globalScanCache.clear()
+}

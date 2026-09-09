@@ -42,6 +42,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     context,
     () => {
       skillProvider?.refresh()
+      skillProvider?.loadScanResults()
       securityReportProvider?.scanAllSkills()
     },
     securityReportProvider,
@@ -141,6 +142,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
   statusBar.setActiveProfile(context.globalState.get<string>(ACTIVE_PROFILE_KEY))
   statusBar.start(config.showStatusBar)
+
+  skillProvider.loadScanResults()
 }
 
 export function deactivate(): void {
