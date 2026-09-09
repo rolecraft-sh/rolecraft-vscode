@@ -30,9 +30,13 @@
     "onCommand:rolecraft.profile.save",
     "onCommand:rolecraft.profile.apply",
     "onCommand:rolecraft.profile.delete",
+    "onCommand:rolecraft.showSkillDetail",
+    "onCommand:rolecraft.showMcpDetail",
+    "onCommand:rolecraft.showProfileDetail",
     "onView:rolecraft.skills",
     "onView:rolecraft.mcp",
-    "onView:rolecraft.profiles"
+    "onView:rolecraft.profiles",
+    "onView:rolecraft.securityReport"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -127,6 +131,11 @@
         {
           "id": "rolecraft.profiles",
           "name": "Profiles"
+        },
+        {
+          "type": "webview",
+          "id": "rolecraft.securityReport",
+          "name": "Security Report"
         }
       ]
     },
@@ -145,19 +154,29 @@
       ],
       "view/item/context": [
         {
+          "command": "rolecraft.test",
+          "when": "view == rolecraft.skills && viewItem == skillInstalled",
+          "group": "1_test"
+        },
+        {
+          "command": "rolecraft.remove",
+          "when": "view == rolecraft.skills && viewItem == skillInstalled",
+          "group": "2_actions"
+        },
+        {
           "command": "rolecraft.mcp.remove",
           "when": "view == rolecraft.mcp && viewItem == mcpServer",
-          "group": "inline"
+          "group": "1_actions"
         },
         {
           "command": "rolecraft.profile.apply",
           "when": "view == rolecraft.profiles && viewItem == profileSaved",
-          "group": "inline"
+          "group": "1_actions"
         },
         {
           "command": "rolecraft.profile.delete",
           "when": "view == rolecraft.profiles && viewItem == profileSaved",
-          "group": "inline"
+          "group": "1_actions"
         }
       ]
     },
@@ -213,8 +232,8 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "node esbuild.js",
-    "watch": "node esbuild.js --watch",
+    "compile": "node esbuild.mjs",
+    "watch": "node esbuild.mjs --watch",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "test": "npx tsx --test --test-concurrency=1 src/**/*.test.ts",
@@ -227,6 +246,7 @@
     "@types/vscode": "^1.85.0",
     "@vscode/vsce": "^3.0.0",
     "esbuild": "^0.25.0",
+    "esbuild-plugin-copy": "^2.1.1",
     "typescript": "^5.5.0"
   }
 }

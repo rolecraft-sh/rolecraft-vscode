@@ -6,28 +6,39 @@ export function registerRemoveCommand(
   context: vscode.ExtensionContext,
   onRefresh: () => void,
 ): void {
-  const disposable = vscode.commands.registerCommand('rolecraft.remove', async () => {
-    let slugs: string[] = []
+  const disposable = vscode.commands.registerCommand('rolecraft.remove', async (arg?: unknown) => {
+    let selected: string | undefined
 
-    try {
-      const result = await runRolecraftJson<SkillListResult>(['list'])
-      slugs = Object.keys(result.skills)
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error)
-      vscode.window.showErrorMessage(`Failed to list skills: ${message}`)
-      return
+    if (typeof arg === 'string') {
+      selected = arg
+    } else if (arg && typeof arg === 'object' && 'slug' in arg) {
+      const slug = (arg as { slug?: unknown }).slug
+      if (typeof slug === 'string') selected = slug
     }
 
-    if (slugs.length === 0) {
-      vscode.window.showInformationMessage('No skills installed.')
-      return
+    if (!selected) {
+      let slugs: string[] = []
+
+      try {
+        const result = await runRolecraftJson<SkillListResult>(['list'])
+        slugs = Object.keys(result.skills)
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error)
+        vscode.window.showErrorMessage(`Failed to list skills: ${message}`)
+        return
+      }
+
+      if (slugs.length === 0) {
+        vscode.window.showInformationMessage('No skills installed.')
+        return
+      }
+
+      const picked = await vscode.window.showQuickPick(slugs, {
+        placeHolder: 'Select a skill to remove...',
+      })
+      if (!picked) return
+      selected = picked
     }
-
-    const selected = await vscode.window.showQuickPick(slugs, {
-      placeHolder: 'Select a skill to remove...',
-    })
-
-    if (!selected) return
 
     const confirm = await vscode.window.showWarningMessage(
       `Remove skill "${selected}"?`,

@@ -27,6 +27,6 @@
     }
   },
   "files": {
-    "ignore": ["dist", "node_modules", "*.vsix"]
+    "ignore": ["dist", "out-compiled", "node_modules", "*.vsix"]
   }
 }

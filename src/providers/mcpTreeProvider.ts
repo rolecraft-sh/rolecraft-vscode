@@ -1,5 +1,6 @@
 import * as vscode from 'vscode'
 import { runRolecraft } from '../utils/cli.js'
+import { showDetailPanel } from '../utils/detailView.js'
 import { RoleCraftNotFoundError } from '../utils/errors.js'
 import { type McpServerEntry, parseMcpList } from '../utils/mcp.js'
 
@@ -18,6 +19,12 @@ export class MCPTreeProvider implements vscode.TreeDataProvider<McpServerEntry> 
     item.contextValue = 'mcpServer'
     item.iconPath = new vscode.ThemeIcon('server-process')
 
+    item.command = {
+      command: 'rolecraft.showMcpDetail',
+      title: 'Show MCP Server Detail',
+      arguments: [element],
+    }
+
     return item
   }
 
@@ -34,4 +41,19 @@ export class MCPTreeProvider implements vscode.TreeDataProvider<McpServerEntry> 
       return []
     }
   }
+}
+
+export function registerShowMcpDetailCommand(context: vscode.ExtensionContext): void {
+  const disposable = vscode.commands.registerCommand(
+    'rolecraft.showMcpDetail',
+    (element?: McpServerEntry) => {
+      if (!element) return
+      showDetailPanel('rolecraftMcpDetail', `MCP Server: ${element.name}`, [
+        { label: 'Name', value: element.name },
+        { label: 'Command', value: element.command },
+        { label: 'Agent', value: element.agent },
+      ])
+    },
+  )
+  context.subscriptions.push(disposable)
 }
