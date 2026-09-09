@@ -1,5 +1,6 @@
 import * as vscode from 'vscode'
 import { runRolecraft } from '../utils/cli.js'
+import { showDetailPanel } from '../utils/detailView.js'
 import { RoleCraftNotFoundError } from '../utils/errors.js'
 import { type ProfileSummary, parseProfileList } from '../utils/profile.js'
 
@@ -23,6 +24,12 @@ export class ProfileTreeProvider implements vscode.TreeDataProvider<ProfileSumma
     item.contextValue = 'profileSaved'
     item.iconPath = new vscode.ThemeIcon('star-full')
 
+    item.command = {
+      command: 'rolecraft.showProfileDetail',
+      title: 'Show Profile Detail',
+      arguments: [element],
+    }
+
     return item
   }
 
@@ -39,4 +46,20 @@ export class ProfileTreeProvider implements vscode.TreeDataProvider<ProfileSumma
       return []
     }
   }
+}
+
+export function registerShowProfileDetailCommand(context: vscode.ExtensionContext): void {
+  const disposable = vscode.commands.registerCommand(
+    'rolecraft.showProfileDetail',
+    (element?: ProfileSummary) => {
+      if (!element) return
+      showDetailPanel('rolecraftProfileDetail', `Profile: ${element.name}`, [
+        { label: 'Name', value: element.name },
+        { label: 'Agents', value: `${element.agentCount} agent(s)` },
+        { label: 'Description', value: element.description ?? '-' },
+        { label: 'Updated At', value: element.updatedAt ?? '-' },
+      ])
+    },
+  )
+  context.subscriptions.push(disposable)
 }

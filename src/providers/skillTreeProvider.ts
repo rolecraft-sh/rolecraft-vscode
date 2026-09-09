@@ -1,6 +1,7 @@
 import * as vscode from 'vscode'
 import type { Skill, SkillListResult } from '../types.js'
 import { runRolecraftJson } from '../utils/cli.js'
+import { showDetailPanel } from '../utils/detailView.js'
 import { RoleCraftNotFoundError } from '../utils/errors.js'
 
 interface SkillElement {
@@ -24,9 +25,9 @@ export class SkillTreeProvider implements vscode.TreeDataProvider<SkillElement> 
     item.iconPath = new vscode.ThemeIcon('check')
 
     item.command = {
-      command: 'rolecraft.test',
-      title: 'Test Skill',
-      arguments: [element.skill],
+      command: 'rolecraft.showSkillDetail',
+      title: 'Show Skill Detail',
+      arguments: [element],
     }
 
     return item
@@ -45,4 +46,23 @@ export class SkillTreeProvider implements vscode.TreeDataProvider<SkillElement> 
       return []
     }
   }
+}
+
+export function registerShowSkillDetailCommand(context: vscode.ExtensionContext): void {
+  const disposable = vscode.commands.registerCommand(
+    'rolecraft.showSkillDetail',
+    (element?: SkillElement) => {
+      if (!element) return
+      const name = element.slug.split('/').pop() ?? element.slug
+      showDetailPanel('rolecraftSkillDetail', `Skill: ${name}`, [
+        { label: 'Slug', value: element.slug },
+        { label: 'Source', value: element.skill.source },
+        { label: 'Source Type', value: element.skill.sourceType },
+        { label: 'Scope', value: element.skill.scope },
+        { label: 'Agents', value: element.skill.agents.join(', ') || '-' },
+        { label: 'Installed At', value: element.skill.installedAt },
+      ])
+    },
+  )
+  context.subscriptions.push(disposable)
 }

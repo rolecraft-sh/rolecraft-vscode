@@ -32,59 +32,86 @@ describe('escapeHtml', () => {
 })
 
 describe('getTestResultHtml', () => {
-  const passedResult: TestResult = {
-    slug: 'test-skill',
-    passed: true,
-    duration: '1.23s',
-    details: 'All tests passed',
+  const mixedResult: TestResult = {
+    skill: 'test-skill',
+    score: 61,
+    grade: 'C',
+    label: 'Adequate',
+    assertions: [
+      { name: 'name-defined', pass: true, detail: 'frontmatter.name is defined', weight: 10 },
+      { name: 'slug-defined', pass: false, detail: 'frontmatter.slug is undefined', weight: 5 },
+      { name: 'code-block-lang', pass: null, detail: 'Code blocks have language tags', weight: 10 },
+    ],
+    suggestions: ['Add "slug" field to frontmatter'],
   }
 
-  const failedResult: TestResult = {
-    slug: 'test-skill',
-    passed: false,
-    duration: '0.5s',
-    details: 'Assertion failed: expected 1 to equal 2',
+  const passingResult: TestResult = {
+    skill: 'test-skill',
+    score: 95,
+    grade: 'A',
+    label: 'Excellent',
+    assertions: [
+      { name: 'name-defined', pass: true, detail: 'frontmatter.name is defined', weight: 10 },
+    ],
+    suggestions: [],
+  }
+
+  const failingResult: TestResult = {
+    skill: 'test-skill',
+    score: 20,
+    grade: 'F',
+    label: 'Poor',
+    assertions: [
+      { name: 'slug-defined', pass: false, detail: 'frontmatter.slug is undefined', weight: 5 },
+    ],
+    suggestions: ['Add "slug" field to frontmatter'],
   }
 
   it('should return valid HTML structure', () => {
-    const html = getTestResultHtml('my-skill', passedResult)
+    const html = getTestResultHtml('my-skill', mixedResult)
     assert.ok(html.includes('<!DOCTYPE html>'))
     assert.ok(html.includes('<html lang="en">'))
     assert.ok(html.includes('</html>'))
   })
 
-  it('should show PASSED status for passing result', () => {
-    const html = getTestResultHtml('my-skill', passedResult)
-    assert.ok(html.includes('PASSED'))
-    assert.ok(html.includes('#4caf50'))
+  it('should show score', () => {
+    const html = getTestResultHtml('my-skill', mixedResult)
+    assert.ok(html.includes('61'))
+    assert.ok(html.includes('Adequate'))
   })
 
-  it('should show FAILED status for failing result', () => {
-    const html = getTestResultHtml('my-skill', failedResult)
-    assert.ok(html.includes('FAILED'))
+  it('should color score badge based on score', () => {
+    const passingHtml = getTestResultHtml('my-skill', passingResult)
+    assert.ok(passingHtml.includes('#4caf50'))
+  })
+
+  it('should include slug in content', () => {
+    const html = getTestResultHtml('my-skill', passingResult)
+    assert.ok(html.includes('my-skill'))
+  })
+
+  it('should count passed, failed, and skipped assertions', () => {
+    const html = getTestResultHtml('my-skill', mixedResult)
+    assert.ok(html.includes('1</div>Passed'))
+    assert.ok(html.includes('1</div>Failed'))
+    assert.ok(html.includes('1</div>Skipped'))
+  })
+
+  it('should render assertions with pass/fail icons', () => {
+    const html = getTestResultHtml('my-skill', mixedResult)
+    assert.ok(html.includes('✅'))
+    assert.ok(html.includes('❌'))
+    assert.ok(html.includes('⏭️'))
+  })
+
+  it('should render suggestions when present', () => {
+    const html = getTestResultHtml('my-skill', mixedResult)
+    assert.ok(html.includes('Suggestions'))
+    assert.ok(html.includes('Add "slug" field to frontmatter'))
+  })
+
+  it('should color low score badge red', () => {
+    const html = getTestResultHtml('my-skill', failingResult)
     assert.ok(html.includes('#f44336'))
-  })
-
-  it('should include slug in title and content', () => {
-    const html = getTestResultHtml('my-skill', passedResult)
-    assert.ok(html.includes('<title>Test Result: my-skill</title>'))
-    assert.ok(html.includes('Skill: my-skill'))
-  })
-
-  it('should include duration', () => {
-    const html = getTestResultHtml('my-skill', passedResult)
-    assert.ok(html.includes('Duration: 1.23s'))
-  })
-
-  it('should escape HTML in details', () => {
-    const result: TestResult = {
-      slug: 'test',
-      passed: true,
-      duration: '0s',
-      details: '<script>alert("xss")</script>',
-    }
-    const html = getTestResultHtml('test', result)
-    assert.ok(html.includes('&lt;script&gt;'))
-    assert.ok(!html.includes('<script>'))
   })
 })

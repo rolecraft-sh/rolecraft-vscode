@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Security report sidebar panel (`WebviewViewProvider`) with animated gauge chart, risk breakdown, and expandable issue list
+- "Scan All Skills" button in security report panel to scan all installed skills at once
+- Security report auto-populates after skill install and on "Test Skill" right-click
+- Install flow shows security report with Approve/Reject/View Details buttons before proceeding
+- Skill, MCP, and Profile tree items open detail webview panel on click
+- Right-click context menu: Test Skill, Remove Skill, Remove MCP, Apply Profile, Delete Profile
+- `src/utils/securityScan.ts` — transforms `rolecraft test` output into `SecurityScanResult`
+- `src/utils/detailView.ts` — shared webview detail panel renderer
+- esbuild.mjs — extension + webview bundle (replaces esbuild.js)
+
+### Fixed
+- Install skill now installs only the selected skill (was installing all 52 from monorepo)
+- Tree view refreshes automatically after skill install
+- Install notification properly closes after completion
+
+### Changed
+- Test Skill command renders result in both sidebar security report and editor webview panel
+- Sidebar security report view requires `"type": "webview"` in package.json for `resolveWebviewView` to fire
+
 ## [0.2.0] - 2026-09-08
 
 ### Added

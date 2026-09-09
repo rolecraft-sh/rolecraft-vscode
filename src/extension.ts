@@ -11,18 +11,23 @@ import { registerTestCommand } from './commands/test.js'
 import { SkillCompletionProvider } from './language/skillCompletion.js'
 import { SkillHoverProvider } from './language/skillHover.js'
 import { SkillValidator } from './language/skillValidator.js'
-import { MCPTreeProvider } from './providers/mcpTreeProvider.js'
-import { ProfileTreeProvider } from './providers/profileTreeProvider.js'
-import { SkillTreeProvider } from './providers/skillTreeProvider.js'
+import { MCPTreeProvider, registerShowMcpDetailCommand } from './providers/mcpTreeProvider.js'
+import {
+  ProfileTreeProvider,
+  registerShowProfileDetailCommand,
+} from './providers/profileTreeProvider.js'
+import { SkillTreeProvider, registerShowSkillDetailCommand } from './providers/skillTreeProvider.js'
 import { StatusBarProvider } from './providers/statusBarProvider.js'
 import { runRolecraft } from './utils/cli.js'
 import { getConfig, onConfigChange } from './utils/config.js'
 import { RoleCraftNotFoundError } from './utils/errors.js'
+import { SecurityReportViewProvider } from './webview/securityReport.js'
 
 let skillProvider: SkillTreeProvider | undefined
 let mcpProvider: MCPTreeProvider | undefined
 let profileProvider: ProfileTreeProvider | undefined
 let statusBar: StatusBarProvider | undefined
+let securityReportProvider: SecurityReportViewProvider | undefined
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
   console.log('RoleCraft extension is now active')
@@ -31,13 +36,21 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   mcpProvider = new MCPTreeProvider()
   profileProvider = new ProfileTreeProvider()
   statusBar = new StatusBarProvider()
+  securityReportProvider = new SecurityReportViewProvider(context.extensionUri)
 
-  registerInstallCommand(context)
+  registerInstallCommand(
+    context,
+    () => {
+      skillProvider?.refresh()
+      securityReportProvider?.scanAllSkills()
+    },
+    securityReportProvider,
+  )
   registerSearchCommand(context)
   registerListCommand(context)
   registerRemoveCommand(context, () => skillProvider?.refresh())
   registerDoctorCommand(context)
-  registerTestCommand(context)
+  registerTestCommand(context, securityReportProvider)
   registerInitCommand(context)
 
   registerMCPCommands(context, () => mcpProvider?.refresh())
@@ -63,6 +76,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   const validator = new SkillValidator()
   validator.setEnabled(config.validationEnabled)
 
+  registerShowSkillDetailCommand(context)
+  registerShowMcpDetailCommand(context)
+  registerShowProfileDetailCommand(context)
+
   context.subscriptions.push(
     statusBar,
     completionProvider,
@@ -71,6 +88,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     vscode.window.registerTreeDataProvider('rolecraft.skills', skillProvider),
     vscode.window.registerTreeDataProvider('rolecraft.mcp', mcpProvider),
     vscode.window.registerTreeDataProvider('rolecraft.profiles', profileProvider),
+    vscode.window.registerWebviewViewProvider(
+      SecurityReportViewProvider.viewType,
+      securityReportProvider,
+    ),
   )
 
   context.subscriptions.push(completionProvider.register(context))

@@ -1,9 +1,10 @@
-import { execFile } from 'node:child_process'
+import { exec } from 'node:child_process'
+import * as os from 'node:os'
 import { promisify } from 'node:util'
 import * as vscode from 'vscode'
 import { RoleCraftError, RoleCraftJsonParseError, RoleCraftNotFoundError } from './errors.js'
 
-const exec = promisify(execFile)
+const execAsync = promisify(exec)
 
 function getExecutablePath(): string {
   const config = vscode.workspace.getConfiguration('rolecraft')
@@ -12,11 +13,18 @@ function getExecutablePath(): string {
 
 export async function runRolecraft(args: string[], cwd?: string): Promise<string> {
   const executablePath = getExecutablePath()
+  const resolvedCwd = cwd ?? vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? os.homedir()
+  const escapedArgs = args.map((a) => `"${a.replace(/"/g, '\\"')}"`).join(' ')
+  const fullCommand = `${executablePath} ${escapedArgs}`
 
   try {
-    const { stdout, stderr } = await exec(executablePath, args, {
-      cwd: cwd ?? vscode.workspace.workspaceFolders?.[0]?.uri.fsPath,
+    const { stdout, stderr } = await execAsync(fullCommand, {
+      cwd: resolvedCwd,
       timeout: 30_000,
+      env: {
+        ...process.env,
+        PATH: process.env.PATH,
+      },
     })
 
     if (stderr) {
@@ -33,7 +41,7 @@ export async function runRolecraft(args: string[], cwd?: string): Promise<string
     }
 
     if (error instanceof Error && 'exitCode' in error) {
-      const execError = error as { exitCode: number; stderr?: string }
+      const execError = error as { exitCode: number; stderr?: string; stdout?: string }
       throw new RoleCraftError(
         `RoleCraft command failed with exit code ${execError.exitCode}`,
         execError.exitCode,

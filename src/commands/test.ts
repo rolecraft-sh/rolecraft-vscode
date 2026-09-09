@@ -1,11 +1,23 @@
+import * as os from 'node:os'
+import * as path from 'node:path'
 import * as vscode from 'vscode'
 import type { SkillListResult } from '../types.js'
 import { runRolecraftJson } from '../utils/cli.js'
+import { securityScanFromTest } from '../utils/securityScan.js'
 import { type TestResult, getTestResultHtml } from '../utils/testResult.js'
+import type { SecurityReportViewProvider } from '../webview/securityReport.js'
 
 export type { TestResult } from '../utils/testResult.js'
 
-export function registerTestCommand(context: vscode.ExtensionContext): void {
+function slugToSkillPath(slug: string): string {
+  const dirName = slug.replace('/', '-')
+  return path.join(os.homedir(), '.agents', 'skills', dirName, 'SKILL.md')
+}
+
+export function registerTestCommand(
+  context: vscode.ExtensionContext,
+  securityReportProvider?: SecurityReportViewProvider,
+): void {
   const disposable = vscode.commands.registerCommand(
     'rolecraft.test',
     async (skillArg?: { slug: string }) => {
@@ -35,12 +47,14 @@ export function registerTestCommand(context: vscode.ExtensionContext): void {
 
       if (!slug) return
 
+      const skillPath = slugToSkillPath(slug)
       let testResult: TestResult
 
       try {
-        testResult = await runRolecraftJson<TestResult>(['test', slug])
+        testResult = await runRolecraftJson<TestResult>(['test', skillPath])
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error)
+        const message =
+          error instanceof Error && error.message ? error.message : String(error ?? 'Unknown error')
         const retry = await vscode.window.showErrorMessage(
           `Failed to test skill "${slug}": ${message}`,
           'Retry',
@@ -49,6 +63,10 @@ export function registerTestCommand(context: vscode.ExtensionContext): void {
           vscode.commands.executeCommand('rolecraft.test', { slug })
         }
         return
+      }
+
+      if (securityReportProvider) {
+        securityReportProvider.render(securityScanFromTest(testResult))
       }
 
       const panel = vscode.window.createWebviewPanel(

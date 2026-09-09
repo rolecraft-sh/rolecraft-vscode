@@ -119,27 +119,34 @@ export function registerProfileCommands(
     }
   })
 
-  const applyDisposable = vscode.commands.registerCommand('rolecraft.profile.apply', async () => {
-    const name = await pickProfile('Select a profile to apply...')
-    if (!name) return
+  const applyDisposable = vscode.commands.registerCommand(
+    'rolecraft.profile.apply',
+    async (arg?: unknown) => {
+      let name = profileNameFromArg(arg)
 
-    const result = await runProfileAction(`Applying profile: ${name}`, ['profile', 'apply', name])
-
-    if (result.ok) {
-      vscode.window.showInformationMessage(`Profile "${name}" applied successfully.`)
-      await context.globalState.update(ACTIVE_PROFILE_KEY, name)
-      callbacks.onActiveProfileChange(name)
-      callbacks.onAllChanged()
-    } else {
-      const retry = await vscode.window.showErrorMessage(
-        result.message || `Failed to apply profile "${name}".`,
-        'Retry',
-      )
-      if (retry === 'Retry') {
-        vscode.commands.executeCommand('rolecraft.profile.apply')
+      if (!name) {
+        name = await pickProfile('Select a profile to apply...')
+        if (!name) return
       }
-    }
-  })
+
+      const result = await runProfileAction(`Applying profile: ${name}`, ['profile', 'apply', name])
+
+      if (result.ok) {
+        vscode.window.showInformationMessage(`Profile "${name}" applied successfully.`)
+        await context.globalState.update(ACTIVE_PROFILE_KEY, name)
+        callbacks.onActiveProfileChange(name)
+        callbacks.onAllChanged()
+      } else {
+        const retry = await vscode.window.showErrorMessage(
+          result.message || `Failed to apply profile "${name}".`,
+          'Retry',
+        )
+        if (retry === 'Retry') {
+          vscode.commands.executeCommand('rolecraft.profile.apply')
+        }
+      }
+    },
+  )
 
   const deleteDisposable = vscode.commands.registerCommand(
     'rolecraft.profile.delete',

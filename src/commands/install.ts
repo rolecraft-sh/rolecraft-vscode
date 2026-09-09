@@ -3,6 +3,9 @@ import * as path from 'node:path'
 import * as vscode from 'vscode'
 import { runRolecraft, runRolecraftJson } from '../utils/cli.js'
 import { type SearchResult, parseSearchResults } from '../utils/search.js'
+import { securityScanFromTest } from '../utils/securityScan.js'
+import type { TestResult } from '../utils/testResult.js'
+import type { SecurityReportViewProvider } from '../webview/securityReport.js'
 
 interface AgentInfo {
   flag: string
@@ -51,14 +54,17 @@ async function getAvailableAgents(): Promise<AgentInfo[]> {
   }
 }
 
-export function registerInstallCommand(context: vscode.ExtensionContext): void {
+export function registerInstallCommand(
+  context: vscode.ExtensionContext,
+  onInstalled?: () => void,
+  securityReportProvider?: SecurityReportViewProvider,
+): void {
   const disposable = vscode.commands.registerCommand('rolecraft.install', async () => {
     const quickPick = vscode.window.createQuickPick()
     quickPick.placeholder = 'Search for skills to install...'
     quickPick.busy = false
 
     let allResults: SearchResult[] = []
-    let selectedResults: SearchResult[] = []
 
     quickPick.onDidChangeValue(async (value) => {
       if (!value.trim()) {
@@ -80,36 +86,22 @@ export function registerInstallCommand(context: vscode.ExtensionContext): void {
 
     quickPick.onDidAccept(async () => {
       const selected = quickPick.selectedItems
+      let fromSearch = false
+      let slug = ''
+
       if (selected.length === 0) {
         const query = quickPick.value.trim()
-        if (query && !query.includes('/') && !query.startsWith('npm:')) {
-          selectedResults = [
-            {
-              slug: query,
-              description: '',
-              version: '',
-              stars: 0,
-              installs: 0,
-            },
-          ]
-        } else {
-          selectedResults = [
-            {
-              slug: query,
-              description: '',
-              version: '',
-              stars: 0,
-              installs: 0,
-            },
-          ]
-        }
+        slug = query
       } else {
-        selectedResults = selected
+        const found = selected
           .map((item) => allResults.find((r) => r.slug === item.label))
           .filter((r): r is SearchResult => r !== undefined)
+        fromSearch = found.length > 0
+        slug = found[0]?.slug ?? quickPick.value.trim()
       }
 
       quickPick.hide()
+      if (!slug) return
 
       const agents = await getAvailableAgents()
       const agentPicks = agents.map((a) => ({
@@ -137,26 +129,48 @@ export function registerInstallCommand(context: vscode.ExtensionContext): void {
 
         agentQuickPick.hide()
 
-        if (selectedResults.length === 0) return
-
-        const source = selectedResults[0].slug
         const agentFlags = selectedAgents.map((a) => `--${a.flag}`)
 
-        await vscode.window.withProgress(
-          {
-            location: vscode.ProgressLocation.Notification,
-            title: `Installing skill: ${source}`,
-            cancellable: false,
-          },
-          async (progress) => {
-            progress.report({ message: 'Running rolecraft install...' })
+        if (securityReportProvider) {
+          try {
+            const skillPath = path.join(
+              os.homedir(),
+              '.agents',
+              'skills',
+              slug.replace('/', '-'),
+              'SKILL.md',
+            )
+            const testResult = await runRolecraftJson<TestResult>(['test', skillPath])
+            const scan = securityScanFromTest(testResult)
+            const approved = await securityReportProvider.showInstallActions(scan)
+            if (!approved) {
+              vscode.window.showInformationMessage('Install cancelled.')
+              return
+            }
+          } catch {
+            // skill not yet installed — no prior test data, proceed with install
+          }
+        }
 
-            try {
-              const args = ['install', source, '--yes', ...agentFlags]
+        try {
+          await vscode.window.withProgress(
+            {
+              location: vscode.ProgressLocation.Notification,
+              title: `Installing skill: ${slug}`,
+              cancellable: false,
+            },
+            async (progress) => {
+              progress.report({ message: 'Running rolecraft install...' })
+
+              const args = fromSearch
+                ? ['install', 'rolecraft-sh/skills', '--skill', slug, '--yes', ...agentFlags]
+                : ['install', slug, '--yes', ...agentFlags]
               await runRolecraft(args)
 
+              onInstalled?.()
+
               const action = await vscode.window.showInformationMessage(
-                `Skill "${source}" installed successfully!`,
+                `Skill "${slug}" installed successfully!`,
                 'Open SKILL.md',
               )
 
@@ -168,10 +182,10 @@ export function registerInstallCommand(context: vscode.ExtensionContext): void {
                   const installedSlug =
                     Object.values(listResult.skills).find(
                       (s) =>
-                        s.slug === source ||
-                        s.slug.endsWith(`/${source}`) ||
-                        s.slug === source.replace(/\//g, '-'),
-                    )?.slug ?? source
+                        s.slug === slug ||
+                        s.slug.endsWith(`/${slug}`) ||
+                        s.slug === slug.replace(/\//g, '-'),
+                    )?.slug ?? slug
 
                   const slugDir = installedSlug.replace(/\//g, '-')
                   const skillPath = path.join(
@@ -189,19 +203,19 @@ export function registerInstallCommand(context: vscode.ExtensionContext): void {
                   vscode.window.showInformationMessage('SKILL.md not found at expected location.')
                 }
               }
-            } catch (error) {
-              const message = error instanceof Error ? error.message : String(error)
-              const retry = await vscode.window.showErrorMessage(
-                `Failed to install skill: ${message}`,
-                'Retry',
-              )
+            },
+          )
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error)
+          const retry = await vscode.window.showErrorMessage(
+            `Failed to install skill: ${message}`,
+            'Retry',
+          )
 
-              if (retry === 'Retry') {
-                vscode.commands.executeCommand('rolecraft.install')
-              }
-            }
-          },
-        )
+          if (retry === 'Retry') {
+            vscode.commands.executeCommand('rolecraft.install')
+          }
+        }
       })
 
       context.subscriptions.push(agentQuickPick)
