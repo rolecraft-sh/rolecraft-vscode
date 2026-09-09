@@ -1,6 +1,29 @@
-# RoleCraft - The Security-First Skill Manager for AI Agents
+<p align="center">
+  <img src="media/icon.png" alt="RoleCraft" width="128" height="128">
+</p>
 
-VS Code extension for [RoleCraft CLI](https://github.com/rolecraft-sh/rolecraft) — install, manage, and discover AI agent skills.
+<h1 align="center">RoleCraft for VS Code</h1>
+
+<p align="center">
+  <b>The Security-First Skill Manager for AI Agents</b><br>
+  Install, manage, and discover AI agent skills from VS Code
+</p>
+
+<p align="center">
+  <a href="https://github.com/rolecraft-sh/rolecraft-vscode/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/rolecraft-sh/rolecraft-vscode/ci.yml?logo=githubactions&label=CI" alt="CI"></a>
+  <a href="https://github.com/rolecraft-sh/rolecraft-vscode/actions/workflows/codeql.yml"><img src="https://img.shields.io/github/actions/workflow/status/rolecraft-sh/rolecraft-vscode/codeql.yml?logo=github&label=CodeQL" alt="CodeQL"></a>
+  <a href="https://github.com/rolecraft-sh/rolecraft-vscode/blob/main/.github/dependabot.yml"><img src="https://img.shields.io/badge/dependabot-enabled-025e8c?logo=Dependabot" alt="Dependabot"></a>
+  <a href="https://github.com/rolecraft-sh/rolecraft-vscode/releases/latest"><img src="https://img.shields.io/github/v/release/rolecraft-sh/rolecraft-vscode?logo=visualstudiocode&label=VS%20Code" alt="VS Code"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?logo=opensourceinitiative&logoColor=white" alt="MIT"></a>
+  <a href="https://github.com/rolecraft-sh/rolecraft-vscode"><img src="https://img.shields.io/github/stars/rolecraft-sh/rolecraft-vscode?style=social" alt="Stars"></a>
+</p>
+
+<p align="center">
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/📜-Changelog-blue" alt="Changelog"></a>
+  <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/🤝-Contributing-green" alt="Contributing"></a>
+  <a href="CODE_OF_CONDUCT.md"><img src="https://img.shields.io/badge/📖-Code%20of%20Conduct-orange" alt="Code of Conduct"></a>
+  <a href="SUPPORT.md"><img src="https://img.shields.io/badge/💬-Support-blue" alt="Support"></a>
+</p>
 
 ## Features
 
