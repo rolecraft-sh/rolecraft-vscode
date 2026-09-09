@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-09-09
+
 ### Added
 - Security report sidebar panel (`WebviewViewProvider`) with animated gauge chart, risk breakdown, and expandable issue list
 - "Scan All Skills" button in security report panel to scan all installed skills at once
