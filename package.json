@@ -16,28 +16,7 @@
   "engines": {
     "vscode": "^1.85.0"
   },
-  "categories": ["Other", "Extension Packs"],
-  "activationEvents": [
-    "onCommand:rolecraft.install",
-    "onCommand:rolecraft.search",
-    "onCommand:rolecraft.list",
-    "onCommand:rolecraft.remove",
-    "onCommand:rolecraft.doctor",
-    "onCommand:rolecraft.test",
-    "onCommand:rolecraft.init",
-    "onCommand:rolecraft.mcp.install",
-    "onCommand:rolecraft.mcp.remove",
-    "onCommand:rolecraft.profile.save",
-    "onCommand:rolecraft.profile.apply",
-    "onCommand:rolecraft.profile.delete",
-    "onCommand:rolecraft.showSkillDetail",
-    "onCommand:rolecraft.showMcpDetail",
-    "onCommand:rolecraft.showProfileDetail",
-    "onView:rolecraft.skills",
-    "onView:rolecraft.mcp",
-    "onView:rolecraft.profiles",
-    "onView:rolecraft.securityReport"
-  ],
+  "categories": ["Other"],
   "main": "./dist/extension.js",
   "contributes": {
     "languages": [
@@ -122,20 +101,24 @@
       "rolecraft": [
         {
           "id": "rolecraft.skills",
-          "name": "Skills"
+          "name": "Skills",
+          "icon": "media/icon.svg"
         },
         {
           "id": "rolecraft.mcp",
-          "name": "MCP Servers"
+          "name": "MCP Servers",
+          "icon": "media/icon.svg"
         },
         {
           "id": "rolecraft.profiles",
-          "name": "Profiles"
+          "name": "Profiles",
+          "icon": "media/icon.svg"
         },
         {
           "type": "webview",
           "id": "rolecraft.securityReport",
-          "name": "Security Report"
+          "name": "Security Report",
+          "icon": "media/icon.svg"
         }
       ]
     },
