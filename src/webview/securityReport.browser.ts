@@ -50,41 +50,62 @@ function renderIssues(issues: SecurityIssue[]): void {
   const container = document.querySelector<HTMLDivElement>('.issue-list')
   if (!container) return
 
+  container.textContent = ''
+
   if (issues.length === 0) {
-    container.innerHTML = `
-      <div class="no-issues">
-        <span class="check-icon">✓</span>
-        <p>Security scan passed. No issues found.</p>
-      </div>`
+    const noIssues = document.createElement('div')
+    noIssues.className = 'no-issues'
+    const checkIcon = document.createElement('span')
+    checkIcon.className = 'check-icon'
+    checkIcon.textContent = '✓'
+    const msg = document.createElement('p')
+    msg.textContent = 'Security scan passed. No issues found.'
+    noIssues.append(checkIcon, msg)
+    container.append(noIssues)
     return
   }
 
-  container.innerHTML = issues
-    .map(
-      (issue, index) => `
-      <details class="issue-item" data-index="${index}">
-        <summary>
-          <span class="dot" style="background:${severityColors[issue.severity]}"></span>
-          <span class="issue-msg">${escapeHtml(issue.message)}</span>
-          <span class="issue-severity" style="color:${severityColors[issue.severity]}">${issue.severity.toUpperCase()}</span>
-        </summary>
-        <div class="issue-details">
-          ${issue.file ? `<span class="issue-meta">📄 ${escapeHtml(issue.file)}</span>` : ''}
-          ${issue.line !== undefined ? `<span class="issue-meta">📍 Line ${issue.line}</span>` : ''}
-        </div>
-      </details>`,
-    )
-    .join('')
-}
+  for (const [index, issue] of issues.entries()) {
+    const details = document.createElement('details')
+    details.className = 'issue-item'
+    details.dataset.index = String(index)
 
-function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
-    .replace(/\\/g, '&#92;')
+    const summary = document.createElement('summary')
+
+    const dot = document.createElement('span')
+    dot.className = 'dot'
+    dot.style.background = severityColors[issue.severity]
+
+    const msg = document.createElement('span')
+    msg.className = 'issue-msg'
+    msg.textContent = issue.message
+
+    const severity = document.createElement('span')
+    severity.className = 'issue-severity'
+    severity.style.color = severityColors[issue.severity]
+    severity.textContent = issue.severity.toUpperCase()
+
+    summary.append(dot, msg, severity)
+
+    const detailsDiv = document.createElement('div')
+    detailsDiv.className = 'issue-details'
+
+    if (issue.file) {
+      const fileSpan = document.createElement('span')
+      fileSpan.className = 'issue-meta'
+      fileSpan.textContent = `📄 ${issue.file}`
+      detailsDiv.append(fileSpan)
+    }
+    if (issue.line !== undefined) {
+      const lineSpan = document.createElement('span')
+      lineSpan.className = 'issue-meta'
+      lineSpan.textContent = `📍 Line ${issue.line}`
+      detailsDiv.append(lineSpan)
+    }
+
+    details.append(summary, detailsDiv)
+    container.append(details)
+  }
 }
 
 function setActionsVisible(visible: boolean): void {
