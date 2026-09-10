@@ -15,10 +15,22 @@ describe('escapeHtml', () => {
     assert.strictEqual(escapeHtml('a > b'), 'a &gt; b')
   })
 
+  it('should escape double quotes', () => {
+    assert.strictEqual(escapeHtml('a "b" c'), 'a &quot;b&quot; c')
+  })
+
+  it('should escape single quotes', () => {
+    assert.strictEqual(escapeHtml("a 'b' c"), 'a &#39;b&#39; c')
+  })
+
+  it('should escape backslashes', () => {
+    assert.strictEqual(escapeHtml('a\\b'), 'a&#92;b')
+  })
+
   it('should escape multiple characters', () => {
     assert.strictEqual(
       escapeHtml('<div class="a">b & c</div>'),
-      '&lt;div class="a"&gt;b &amp; c&lt;/div&gt;',
+      '&lt;div class=&quot;a&quot;&gt;b &amp; c&lt;/div&gt;',
     )
   })
 
@@ -107,7 +119,7 @@ describe('getTestResultHtml', () => {
   it('should render suggestions when present', () => {
     const html = getTestResultHtml('my-skill', mixedResult)
     assert.ok(html.includes('Suggestions'))
-    assert.ok(html.includes('Add "slug" field to frontmatter'))
+    assert.ok(html.includes('Add &quot;slug&quot; field to frontmatter'))
   })
 
   it('should color low score badge red', () => {
