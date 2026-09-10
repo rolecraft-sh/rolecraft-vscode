@@ -67,4 +67,4 @@ export async function runRolecraftJson<T>(args: string[], cwd?: string): Promise
   }
 }
 
-export { RoleCraftError, RoleCraftNotFoundError, RoleCraftJsonParseError } from './errors.js'
+export { RoleCraftError, RoleCraftJsonParseError, RoleCraftNotFoundError } from './errors.js'
