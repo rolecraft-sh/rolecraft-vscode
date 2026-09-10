@@ -38,7 +38,9 @@ body {
   stroke-linecap: round;
   stroke-dasharray: 276.46;
   stroke-dashoffset: 276.46;
-  transition: stroke-dashoffset 0.6s ease, stroke 0.6s ease;
+  transition:
+    stroke-dashoffset 0.6s ease,
+    stroke 0.6s ease;
 }
 
 .gauge-center {

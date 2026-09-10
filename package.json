@@ -16,14 +16,21 @@
   "engines": {
     "vscode": "^1.85.0"
   },
-  "categories": ["Other"],
+  "categories": [
+    "Other"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "languages": [
       {
         "id": "skill",
-        "aliases": ["SKILL", "skill"],
-        "extensions": [".skill.md"]
+        "aliases": [
+          "SKILL",
+          "skill"
+        ],
+        "extensions": [
+          ".skill.md"
+        ]
       }
     ],
     "commands": [
@@ -181,7 +188,10 @@
           "items": {
             "type": "string"
           },
-          "default": ["cursor", "claude-code"],
+          "default": [
+            "cursor",
+            "claude-code"
+          ],
           "description": "Default agents for skill installation"
         },
         "rolecraft.showStatusBar": {
@@ -196,7 +206,11 @@
         },
         "rolecraft.securityNotification": {
           "type": "string",
-          "enum": ["warning", "error", "off"],
+          "enum": [
+            "warning",
+            "error",
+            "off"
+          ],
           "default": "warning",
           "description": "Security notification level"
         },
@@ -224,12 +238,12 @@
     "publish": "vsce publish"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.0",
+    "@biomejs/biome": "2.5.12",
     "@types/node": "^26.4.1",
     "@types/vscode": "^1.85.0",
     "@vscode/vsce": "^3.0.0",
     "esbuild": "^0.28.2",
     "esbuild-plugin-copy": "^2.1.1",
-    "typescript": "^5.5.0"
+    "typescript": "7.0.2"
   }
 }

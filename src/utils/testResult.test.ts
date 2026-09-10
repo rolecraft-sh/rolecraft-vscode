@@ -1,6 +1,6 @@
 import assert from 'node:assert'
 import { describe, it } from 'node:test'
-import { type TestResult, escapeHtml, getTestResultHtml } from '../utils/testResult.js'
+import { escapeHtml, getTestResultHtml, type TestResult } from '../utils/testResult.js'
 
 describe('escapeHtml', () => {
   it('should escape ampersands', () => {

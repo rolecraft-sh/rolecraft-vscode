@@ -16,7 +16,7 @@ import {
   ProfileTreeProvider,
   registerShowProfileDetailCommand,
 } from './providers/profileTreeProvider.js'
-import { SkillTreeProvider, registerShowSkillDetailCommand } from './providers/skillTreeProvider.js'
+import { registerShowSkillDetailCommand, SkillTreeProvider } from './providers/skillTreeProvider.js'
 import { StatusBarProvider } from './providers/statusBarProvider.js'
 import { runRolecraft } from './utils/cli.js'
 import { getConfig, onConfigChange } from './utils/config.js'

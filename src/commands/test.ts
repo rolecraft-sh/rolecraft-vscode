@@ -4,7 +4,7 @@ import * as vscode from 'vscode'
 import type { SkillListResult } from '../types.js'
 import { runRolecraftJson } from '../utils/cli.js'
 import { securityScanFromTest } from '../utils/securityScan.js'
-import { type TestResult, getTestResultHtml } from '../utils/testResult.js'
+import { getTestResultHtml, type TestResult } from '../utils/testResult.js'
 import type { SecurityReportViewProvider } from '../webview/securityReport.js'
 
 export type { TestResult } from '../utils/testResult.js'

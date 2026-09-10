@@ -4,7 +4,7 @@ import * as vscode from 'vscode'
 import type { SecurityScanResult } from '../types.js'
 import { runRolecraft, runRolecraftJson } from '../utils/cli.js'
 import { getConfig } from '../utils/config.js'
-import { type SearchResult, parseSearchResults } from '../utils/search.js'
+import { parseSearchResults, type SearchResult } from '../utils/search.js'
 import {
   getCachedScan,
   issueCount,
