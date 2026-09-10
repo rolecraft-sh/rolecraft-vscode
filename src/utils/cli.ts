@@ -14,7 +14,9 @@ function getExecutablePath(): string {
 export async function runRolecraft(args: string[], cwd?: string): Promise<string> {
   const executablePath = getExecutablePath()
   const resolvedCwd = cwd ?? vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? os.homedir()
-  const escapedArgs = args.map((a) => `"${a.replace(/"/g, '\\"')}"`).join(' ')
+  const escapedArgs = args
+    .map((a) => `"${a.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`)
+    .join(' ')
   const fullCommand = `${executablePath} ${escapedArgs}`
 
   try {
