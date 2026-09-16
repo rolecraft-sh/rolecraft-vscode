@@ -238,7 +238,7 @@
     "publish": "vsce publish"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.12",
+    "@biomejs/biome": "2.5.13",
     "@types/node": "^26.4.1",
     "@types/vscode": "^1.85.0",
     "@vscode/vsce": "^3.0.0",
