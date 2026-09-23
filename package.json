@@ -239,7 +239,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.14",
-    "@types/node": "^26.4.1",
+    "@types/node": "^26.6.2",
     "@types/vscode": "^1.138.0",
     "@vscode/vsce": "^3.0.0",
     "esbuild": "^0.28.2",
