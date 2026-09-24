@@ -9,6 +9,8 @@ updates:
       - dependencies
     commit-message:
       prefix: "chore"
+    ignore:
+      - dependency-name: "@types/vscode"
 
   - package-ecosystem: github-actions
     directory: /
